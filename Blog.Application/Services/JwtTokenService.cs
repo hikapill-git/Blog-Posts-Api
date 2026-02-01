@@ -27,6 +27,8 @@ namespace Blog.Application.Services
                 new Claim(ClaimTypes.Role, "User"),
                 new Claim("Id", user.Id.ToString()),
                 new Claim("FullName", $"{user.FName} {user.LName}"),
+                new Claim("UserRole", user.Role),
+                new Claim("UserEmail", user.EmailId),
                 //user.FName + " " + user.LName!
         };
 
