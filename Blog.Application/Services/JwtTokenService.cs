@@ -26,7 +26,8 @@ namespace Blog.Application.Services
                 new Claim(ClaimTypes.Email, user.EmailId!),
                 new Claim(ClaimTypes.Role, "User"),
                 new Claim("Id", user.Id.ToString()),
-                new Claim("FullName", user.FName+" "+user.LName!),
+                new Claim("FullName", $"{user.FName} {user.LName}"),
+                //user.FName + " " + user.LName!
         };
 
             var key = new SymmetricSecurityKey(
