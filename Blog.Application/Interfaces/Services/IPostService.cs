@@ -11,5 +11,6 @@ namespace Blog.Application.Interfaces.Services
         Task CommentAsync(int postId, CreateCommentDto dto, int userId);
         Task LikeAsync(int postId, int userId);
         Task<List<PostDto>> GetPostsByUserIdAsync(int userId);
+        Task<PostDto> GetPostByIdAsync(int id);
     }
 }

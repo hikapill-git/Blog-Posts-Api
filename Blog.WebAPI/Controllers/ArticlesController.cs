@@ -34,7 +34,13 @@ namespace Blog.WebAPI.Controllers
         {
             return Ok(await _postService.GetPendingAsync());
         }
-        [HttpGet("{userId}")]
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<PostDto>> GetPostById(int id)
+        {
+            return Ok(await _postService.GetPostByIdAsync(id));
+        }
+        [HttpGet("user/{userId}")]
         [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int userId)
         {

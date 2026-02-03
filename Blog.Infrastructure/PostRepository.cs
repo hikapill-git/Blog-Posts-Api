@@ -79,5 +79,14 @@ namespace Blog.Infrastructure
                    // .Include(p => p.User)     // load related author profile
                    .ToListAsync();
         }
+        public async Task<Post?> GetPostByIdAsync(int userId)
+        {
+            return await _context.Posts
+                   .Where(p => p.UserId == userId)
+                   .Include(p => p.Comments)          // load related comments
+                    .Include(p => p.Likes)     // load related likes
+                    .Include(p => p.User)     // load related author profile
+                   .FirstOrDefaultAsync();
+        }
     }
 }
