@@ -47,8 +47,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-// Add App Insights
-builder.Services.AddApplicationInsightsTelemetry();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
@@ -63,7 +62,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+// The SDK automatically checks:
+// 1. Environment Variable "APPLICATIONINSIGHTS_CONNECTION_STRING" (Azure Priority)
+// 2. appsettings.json section "ApplicationInsights:ConnectionString" (Local Fallback)
+builder.Services.AddApplicationInsightsTelemetry();
 var app = builder.Build();
 //app.UseCors("default");
 // Use CORS Middleware (Must be before Auth/Controllers)
