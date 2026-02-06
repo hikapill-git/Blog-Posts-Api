@@ -52,7 +52,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("default", policy =>
+    options.AddPolicy("AllowLocalhost4200", policy =>
     {
         policy.WithOrigins("http://localhost:4200") // exact origin
                  .AllowAnyHeader()
