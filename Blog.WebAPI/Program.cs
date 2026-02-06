@@ -3,6 +3,7 @@ using Blog.Application.Interfaces.Repositories;
 using Blog.Application.Interfaces.Services;
 using Blog.Application.Services;
 using Blog.Infrastructure;
+using Blog.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+// Add App Insights
+builder.Services.AddApplicationInsightsTelemetry();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
@@ -62,7 +65,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseCors("default");
+//app.UseCors("default");
+// Use CORS Middleware (Must be before Auth/Controllers)
+app.UseCors("AllowLocalhost4200");
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -94,6 +99,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// 1. Add Response Middleware FIRST (Outer Layer)
+// It starts first, creates the memory stream buffer, calls next, then waits for the return trip to log.
+app.UseMiddleware<ResponseBodyLoggingMiddleware>();
+
+// 2. Add Request Middleware SECOND (Inner Layer)
+// It reads the input, logs it, and passes it to the controller.
+app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
