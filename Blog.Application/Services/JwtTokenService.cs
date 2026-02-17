@@ -20,11 +20,15 @@ namespace Blog.Application.Services
 
         public string GenerateAccessToken(User user)
         {
+            if (string.IsNullOrWhiteSpace(user.Role))
+            {
+                user.Role = "User";
+            }
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.EmailId!),
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, user.Role),
                 new Claim("Id", user.Id.ToString()),
                 new Claim("FullName", $"{user.FName} {user.LName}"),
                 new Claim("UserRole", user.Role),
@@ -37,6 +41,8 @@ namespace Blog.Application.Services
             );
 
             var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)

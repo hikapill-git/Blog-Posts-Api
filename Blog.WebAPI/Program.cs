@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            //ValidateLifetime = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen();
 // The SDK automatically checks:
 // 1. Environment Variable "APPLICATIONINSIGHTS_CONNECTION_STRING" (Azure Priority)
 // 2. appsettings.json section "ApplicationInsights:ConnectionString" (Local Fallback)
-builder.Services.AddApplicationInsightsTelemetry();
+//builder.Services.AddApplicationInsightsTelemetry();
 var app = builder.Build();
 //app.UseCors("default");
 // Use CORS Middleware (Must be before Auth/Controllers)
@@ -96,6 +96,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUi(options =>
     {
+        //options
         options.DocumentPath = "openapi/v1.json";
     });
 }

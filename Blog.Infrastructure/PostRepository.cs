@@ -1,6 +1,7 @@
 ﻿using Blog.Application.Interfaces.Repositories;
 using Blog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Blog.Infrastructure
 {
@@ -59,10 +60,25 @@ namespace Blog.Infrastructure
                    .ToListAsync();
         }
 
-        public async Task<List<Post>> GetPostsAsync()
+        public async Task<List<Post>> GetPostsAsync(string status)
         {
-            return await _context.Posts
-                   .Where(p => p.IsApproved)
+            IQueryable<Post> query = _context.Posts;
+
+            switch (status.ToLower())
+            {
+                case "approved":
+                    query = query.Where(p => p.IsApproved);
+                    break;
+                case "pending":
+                    query = query.Where(p => !p.IsApproved);
+                    break;
+                case "all":
+                default:
+                    // no filter
+                    break;
+            }
+
+            return await query
                    .OrderByDescending(p => p.CreatedAt)
                    .Include(p => p.Comments)          // load related comments
                     .Include(p => p.Likes)     // load related likes
@@ -87,6 +103,33 @@ namespace Blog.Infrastructure
                     .Include(p => p.Likes)     // load related likes
                     .Include(p => p.User)     // load related author profile
                    .FirstOrDefaultAsync();
+        }
+        public async Task<bool> UpdatePostAsync(Post postData)
+        {
+            bool retVal = false;
+            Post? post = await _context.Posts.FirstOrDefaultAsync(e => e.Id == postData.Id);
+            if (post != null)
+            {
+                if (post.Content != postData.Content || post.Title != postData.Title)
+                {
+
+                    post.Content = postData.Content;
+                    post.Title = postData.Title;
+                    post.IsApproved = false;
+                    //_context.Entry(post).State = EntityState.Modified;
+                    //var affected = await _context.SaveChangesAsync();
+
+                    var affected = await _context.SaveChangesAsync();
+                    //Console.WriteLine($"Rows affected: {affected}");
+                    //var fresh = await _context.Posts.AsNoTracking()
+                    //                                .FirstOrDefaultAsync(p => p.Id == postData.Id);
+                    //Console.WriteLine($"Fresh DB values: {fresh?.Content}, {fresh?.Title}, {fresh?.IsApproved}");
+
+
+                    retVal = true;
+                }
+            }
+            return retVal;
         }
     }
 }

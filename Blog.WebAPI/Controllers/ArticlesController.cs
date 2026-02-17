@@ -16,6 +16,7 @@ namespace Blog.WebAPI.Controllers
             this._postService = _postService;
         }
         [HttpGet]
+        //[Authorize]
         public async Task<ActionResult<List<PostDto>>> GetAll()
         {
             return Ok(await _postService.GetAllAsync());
@@ -28,11 +29,19 @@ namespace Blog.WebAPI.Controllers
             await _postService.CreateAsync(dto, userId);
             return Ok();
         }
+        [HttpPut]
+        [Authorize]
+        public async Task<ActionResult> Update(CreatePostDto dto, int postId)
+        {
+            await _postService.UpdateAsync(dto, postId);
+            return Ok();
+        }
+
         [HttpGet("Pending")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<PendingPostDto>>> Pending()
+        public async Task<ActionResult<List<PendingPostDto>>> Pending([FromQuery] string status = "all")
         {
-            return Ok(await _postService.GetPendingAsync());
+            return Ok(await _postService.GetPendingAsync(status));
         }
         [HttpGet("{id}")]
         [Authorize]
@@ -46,15 +55,15 @@ namespace Blog.WebAPI.Controllers
         {
             return Ok(await _postService.GetPostsByUserIdAsync(userId));
         }
-        [HttpPut("{id}/approve")]
+        [HttpPatch("{id}/approve")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> Approve(int id)
+        public async Task<ActionResult> Approve(int id, [FromQuery] bool status)
         {
-            await _postService.ApproveAsync(id);
+            await _postService.ApproveAsync(id, status);
             return Ok();
         }
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             await _postService.DeleteAsync(id);

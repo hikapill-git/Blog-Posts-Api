@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts; // Required namespaces
 
 namespace Blog.WebAPI.Middlewares
@@ -44,10 +43,6 @@ namespace Blog.WebAPI.Middlewares
 
             // 5. Move to next middleware
             await _next(context);
-
-
-
-
         }
         private bool IsTextBasedContentType(string contentType)
         {

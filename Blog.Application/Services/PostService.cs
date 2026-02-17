@@ -14,9 +14,9 @@ namespace Blog.Application.Services
             this.repository = repository;
         }
 
-        public async Task ApproveAsync(int id)
+        public async Task ApproveAsync(int id, bool status)
         {
-            await repository.ApprovePostAsync(id, true);
+            await repository.ApprovePostAsync(id, status);
         }
 
         public async Task CommentAsync(int postId, CreateCommentDto dto, int userId)
@@ -48,7 +48,7 @@ namespace Blog.Application.Services
 
         public async Task<List<PostDto>> GetAllAsync()
         {
-            var posts = await repository.GetPostsAsync();
+            var posts = await repository.GetPostsAsync("approved");
             return posts.Select(p => new PostDto(
                     p.Id,
                     p.Title,
@@ -63,9 +63,9 @@ namespace Blog.Application.Services
                 )).ToList();
         }
 
-        public async Task<List<PendingPostDto>> GetPendingAsync()
+        public async Task<List<PendingPostDto>> GetPendingAsync(string status)
         {
-            var posts = await repository.GetPostsAsync();
+            var posts = await repository.GetPostsAsync(status);
             return posts.Select(p => new PendingPostDto(
                     p.Id,
                     p.Title,
@@ -122,6 +122,16 @@ namespace Blog.Application.Services
             }
             return dto;
 
+        }
+        public async Task<bool> UpdateAsync(CreatePostDto dto, int postId)
+        {
+            Post post = new Post
+            {
+                Id = postId,
+                Content = dto.Content,
+                Title = dto.Title,
+            };
+          return  await repository.UpdatePostAsync(post);
         }
     }
 }

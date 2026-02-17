@@ -16,8 +16,10 @@ namespace Blog.Application.Interfaces.Repositories
 
         Task<List<Post>> GetPendingPostsAsync();
 
-        Task<List<Post>> GetPostsAsync();
+        Task<List<Post>> GetPostsAsync(string status);
         Task<List<Post>> GetPostsByUserIdAsync(int userId);
         Task<Post?> GetPostByIdAsync(int id);
+
+        Task<bool> UpdatePostAsync(Post postData);
     }
 }
