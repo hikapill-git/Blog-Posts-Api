@@ -96,31 +96,32 @@ namespace Blog.Application.Services
         }
         public async Task<PostDto> GetPostByIdAsync(int id) 
         {
-            var posts = await repository.GetPostByIdAsync(id);
-            PostDto dto = new PostDto(
-                    0,
-                    string.Empty,
-                    string.Empty,
-                    false,
-                    0,
-                    new List<CommentDto>()
-                );
-            if (posts != null)
-            {
-               dto = new PostDto(
-                    posts.Id,
-                    posts.Title,
-                    posts.Content,
-                    posts.IsApproved,
-                    posts.Likes.Count(),
-                    posts.Comments.Select(c => new CommentDto(
-                        c.Id,
-                        c.Text,
-                        posts.User.FName + " " + posts.User.LName
-                    )).ToList()
-                );
-            }
-            return dto;
+            return await repository.GetPostByIdAsync(id);
+            //var posts = await repository.GetPostByIdAsync(id);
+            //PostDto dto = new PostDto(
+            //        0,
+            //        string.Empty,
+            //        string.Empty,
+            //        false,
+            //        0,
+            //        new List<CommentDto>()
+            //    );
+            //if (posts != null)
+            //{
+            //   dto = new PostDto(
+            //        posts.Id,
+            //        posts.Title,
+            //        posts.Content,
+            //        posts.IsApproved,
+            //        posts.Likes.Count(),
+            //        posts.Comments.Select(c => new CommentDto(
+            //            c.Id,
+            //            c.Text,
+            //            posts.User.FName + " " + posts.User.LName
+            //        )).ToList()
+            //    );
+            //}
+            //return dto;
 
         }
         public async Task<bool> UpdateAsync(CreatePostDto dto, int postId)

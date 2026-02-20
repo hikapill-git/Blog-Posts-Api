@@ -1,4 +1,5 @@
-﻿using Blog.Application.Interfaces.Repositories;
+﻿using Blog.Application.DTOs;
+using Blog.Application.Interfaces.Repositories;
 using Blog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -95,14 +96,35 @@ namespace Blog.Infrastructure
                    // .Include(p => p.User)     // load related author profile
                    .ToListAsync();
         }
-        public async Task<Post?> GetPostByIdAsync(int userId)
+        public async Task<PostDto?> GetPostByIdAsync(int postId)
         {
             return await _context.Posts
-                   .Where(p => p.UserId == userId)
-                   .Include(p => p.Comments)          // load related comments
-                    .Include(p => p.Likes)     // load related likes
-                    .Include(p => p.User)     // load related author profile
-                   .FirstOrDefaultAsync();
+         .Where(p => p.Id == postId)
+         .Select(p => new PostDto(
+             p.Id,
+             p.Title,
+             p.Content,
+             p.IsApproved,
+             p.Likes.Count(),
+             p.Comments.OrderByDescending(e=> e.Id).Select(c => new CommentDto(
+                 c.Id,
+                 c.Text,
+                 _context.Users
+                     .Where(u => u.Id == c.UserId)
+                     .Select(u => u.FName + " " + u.LName)
+                     .FirstOrDefault() ?? "Unknown User"
+             )).ToList()
+         ))
+         .FirstOrDefaultAsync();
+
+
+
+            //return await _context.Posts
+            //       .Where(p => p.Id == postId)
+            //       .Include(p => p.Comments)          // load related comments
+            //        .Include(p => p.Likes)     // load related likes
+            //        .Include(p => p.User)     // load related author profile
+            //       .FirstOrDefaultAsync();
         }
         public async Task<bool> UpdatePostAsync(Post postData)
         {

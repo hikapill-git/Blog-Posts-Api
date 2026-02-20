@@ -1,4 +1,5 @@
-﻿using Blog.Domain.Entities;
+﻿using Blog.Application.DTOs;
+using Blog.Domain.Entities;
 
 namespace Blog.Application.Interfaces.Repositories
 {
@@ -18,7 +19,7 @@ namespace Blog.Application.Interfaces.Repositories
 
         Task<List<Post>> GetPostsAsync(string status);
         Task<List<Post>> GetPostsByUserIdAsync(int userId);
-        Task<Post?> GetPostByIdAsync(int id);
+        Task<PostDto?> GetPostByIdAsync(int id);
 
         Task<bool> UpdatePostAsync(Post postData);
     }
