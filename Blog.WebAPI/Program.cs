@@ -6,6 +6,7 @@ using Blog.Infrastructure;
 using Blog.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -45,6 +46,41 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Add Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 2; // Max requests
+        limiterOptions.Window = TimeSpan.FromSeconds(20); // Time window
+        //limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        //limiterOptions.QueueLimit = 2; // Requests queued before rejecting
+    });
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+
+        var result = new { error = "Rate limit exceeded. Please try again later." };
+        await context.HttpContext.Response.WriteAsJsonAsync(result, cancellationToken);
+    };
+    // Custom response when limit is exceeded
+    //options.OnRejected = async (context, cancellationToken) =>
+    //{
+    //    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+    //    await context.HttpContext.Response.WriteAsync(
+    //        "Rate limit exceeded. Please try again later.", cancellationToken);
+    //};
+});
+
+// Add API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.ReportApiVersions = true; // Adds headers with supported versions
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
@@ -67,6 +103,9 @@ builder.Services.AddSwaggerGen();
 // 2. appsettings.json section "ApplicationInsights:ConnectionString" (Local Fallback)
 //builder.Services.AddApplicationInsightsTelemetry();
 var app = builder.Build();
+// Use Rate Limiting Middleware
+
+
 //app.UseCors("default");
 // Use CORS Middleware (Must be before Auth/Controllers)
 app.UseCors("AllowLocalhost4200");
@@ -111,7 +150,6 @@ app.UseMiddleware<ResponseBodyLoggingMiddleware>();
 app.UseMiddleware<RequestBodyLoggingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseRateLimiter();
 app.MapControllers();
-
 app.Run();

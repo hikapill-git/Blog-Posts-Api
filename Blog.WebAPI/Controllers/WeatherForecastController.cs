@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Blog.WebAPI.Controllers
 {
@@ -17,6 +18,9 @@ namespace Blog.WebAPI.Controllers
         {
             _logger = logger;
         }
+        [EnableRateLimiting("fixed")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
 
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
@@ -28,6 +32,31 @@ namespace Blog.WebAPI.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        
+
+    }
+    [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
+    public class ProductsController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetV1()
+        {
+            return Ok("Products from API v1.0");
+        }
+    }
+
+    [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("2.0")]
+    public class ProductsV2Controller : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetV2()
+        {
+            return Ok("Products from API v2.0 with new features");
         }
     }
 }

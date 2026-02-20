@@ -49,6 +49,11 @@ namespace Blog.WebAPI.Controllers
         {
             return Ok(await _postService.GetPostByIdAsync(id));
         }
+        [HttpGet("{id}/approved")]
+        public async Task<ActionResult<PostDto>> GetApprovedPostById(int id)
+        {
+            return Ok(await _postService.GetPostByIdAsync(id));
+        }
         [HttpGet("user/{userId}")]
         [Authorize]
         public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int userId)
