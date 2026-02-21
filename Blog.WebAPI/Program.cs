@@ -91,7 +91,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost4200", policy =>
     {
         //policy.WithOrigins("http://localhost:4200") // exact origin
-        policy.WithOrigins("https://my-blogs-fhcrbjfhdbf0hdgp.centralindia-01.azurewebsites.net/") // exact origin
+        policy.WithOrigins("https://blog-platform-fydbc3fmdaffbggk.centralindia-01.azurewebsites.net") // exact origin
                  .AllowAnyHeader()
                  .AllowAnyMethod()
                  .AllowCredentials(); // allow cookies/auth headers
